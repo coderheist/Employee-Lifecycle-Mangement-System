@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HRMS - Manager Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/manager.css">
+</head>
+<body>
+
+    <nav class="topnav">
+        <div class="topnav-inner">
+            <div class="brand">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-briefcase"></i>
+                </div>
+                <div>
+                    <div class="brand-text">GenC HRMS</div>
+                    <div class="brand-sub">Management Suite</div>
+                </div>
+            </div>
+
+            <div class="nav-tabs-hrms">
+                <button class="nav-item active" id="tab-leave" onclick="switchTab('leave')">
+                    <i class="fa-solid fa-clipboard-check"></i> Leave Approvals
+                </button>
+                <button class="nav-item" id="tab-payroll" onclick="switchTab('payroll')">
+                    <i class="fa-solid fa-file-invoice-dollar"></i> Payroll
+                </button>
+            </div>
+
+            <div class="nav-right-section">
+                <button class="btn-logout" onclick="handleLogout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main">
+        <div id="leave-section">
+            <div class="topbar">
+                <div>
+                    <h1 class="page-title">Leave Approvals</h1>
+                    <p class="page-subtitle">Review, track, and manage team absence requests</p>
+                </div>
+                <button class="btn-primary-hrms" onclick="fetchLeaveRequests()">
+                    <i class="fa-solid fa-rotate"></i> Refresh Data
+                </button>
+            </div>
+            <div class="card">
+                <div class="card-head">
+                    <div class="card-head-title-block">
+                        <i class="fa-solid fa-list-check"></i>
+                        <h6>Applied Leave Operations Queue</h6>
+                    </div>
+                </div>
+                <div class="card-body-inner">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Request ID</th>
+                                    <th>Employee ID</th>
+                                    <th>Leave Type</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Total Days</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leave-table-body">
+                                <tr>
+                                    <td colspan="8" class="no-data">Loading application entries...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="payroll-section" style="display: none;">
+            <div class="topbar">
+                <div>
+                    <h1 class="page-title">Payroll View</h1>
+                    <p class="page-subtitle">View and filter team payroll records by period</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-head">
+                    <div class="card-head-title-block">
+                        <i class="fa-solid fa-money-check-dollar"></i>
+                        <h6>Payroll View (Pending & Completed)</h6>
+                    </div>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <label style="margin: 0; font-size: 0.85rem; font-weight: 600; color: #1e2a5e;">Filter by Period:</label>
+                        <input type="month" id="tableFilterPeriod" class="filter-input" onchange="loadTableData()" />
+                        <button class="btn-action" style="border: 1px solid #d1d5db; background: white;" onclick="document.getElementById('tableFilterPeriod').value=''; loadTableData();">
+                            Clear
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body-inner">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Payroll ID</th>
+                                    <th>Employee ID</th>
+                                    <th>Pay Period</th>
+                                    <th>Gross Salary</th>
+                                    <th>Deductions</th>
+                                    <th>Net Salary</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="payrollTableBody">
+                                <tr>
+                                    <td colspan="7" class="no-data">Please select a Pay Period to view records.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="toast" class="toast-box"></div>
+
+    <script src="../js/manager.js"></script>
+</body>
+</html>

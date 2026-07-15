@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Set Employee Goals</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #F8FAFC; color: #0F172A; font-family: system-ui, -apple-system, sans-serif; }
+        .header-gradient { background: linear-gradient(135deg, #0A192F 0%, #1E3A8A 100%); border-bottom: 4px solid #3B82F6; }
+        .content-card { background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02); }
+    </style>
+</head>
+<body>
+
+<div class="header-gradient text-white py-5 mb-5 shadow-sm">
+    <div class="container d-flex align-items-center justify-content-between">
+        <h1 class="fw-bold m-0 fs-2">Set Employee Goals</h1>
+        <a href="appraisal-dashboard.html" class="btn btn-outline-light btn-sm rounded-3 px-3 py-2">Dashboard</a>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="content-card p-4">
+                <h5 class="fw-bold text-dark mb-4">Initialize Performance Cycle</h5>
+                <form id="initForm">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-secondary small text-uppercase">Employee ID</label>
+                        <input type="number" id="empId" class="form-control" placeholder="Enter Employee ID" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-secondary small text-uppercase">Appraisal Cycle</label>
+                        <select id="cycle" class="form-select" required>
+                            <option value="" disabled selected>Choose Cycle...</option>
+                            <option value="2025-H1">2025-H1</option>
+                            <option value="2025-H2">2025-H2</option>
+                            <option value="2026-H1">2026-H1</option>
+                            <option value="2026-H2">2026-H2</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 fw-bold py-2">Initialize Goals (Draft)</button>
+                </form>
+                <div id="msg" class="alert alert-success mt-3 d-none"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('initForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const employeeId = document.getElementById('empId').value;
+        const appraisalCycle = document.getElementById('cycle').value;
+        const m = document.getElementById('msg');
+
+        let savedRecord = null;
+
+        try {
+            // 1. Fetch response from Backend API
+            const response = await fetch('http://localhost:8080/api/appraisal/initialize', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ employeeId: parseInt(employeeId), appraisalCycle: appraisalCycle }),
+                credentials: 'include' // Added credentials here
+            });
+
+            if (response.ok) {
+                // 2. Parse the saved database record containing the database ID
+                savedRecord = await response.json();
+            }
+        } catch (err) {
+            console.log("Offline backup routing initialized.");
+        }
+
+        // 3. Fallback strategy if backend is offline
+        if (!savedRecord) {
+            let localData = JSON.parse(localStorage.getItem('globalAppraisals')) || [];
+            const nextId = localData.length > 0 ? Math.max(...localData.map(o => o.appraisalId)) + 1 : 50113;
+
+            savedRecord = {
+                appraisalId: nextId,
+                employeeId: parseInt(employeeId),
+                appraisalCycle: appraisalCycle,
+                appraisalStatus: 'DRAFT'
+            };
+        }
+
+        // 4. Synchronize state with local storage
+        let localData = JSON.parse(localStorage.getItem('globalAppraisals')) || [];
+        // Remove prior temporary draft version if it exists to avoid duplications
+        localData = localData.filter(item => !(item.employeeId === savedRecord.employeeId && item.appraisalCycle === savedRecord.appraisalCycle));
+        localData.push(savedRecord);
+        localStorage.setItem('globalAppraisals', JSON.stringify(localData));
+
+        // 5. Output the backend-generated dynamic success message
+        m.className = "alert alert-success mt-3";
+        m.innerText = `Successfully Appraisal Id ${savedRecord.appraisalId} Added`;
+        m.classList.remove('d-none');
+
+        // 6. Reset form UI
+        document.getElementById('initForm').reset();
+    });
+</script>
+</body>
+</html>

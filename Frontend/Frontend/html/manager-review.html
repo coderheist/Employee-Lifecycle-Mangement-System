@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manager Review Board</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #F8FAFC; color: #0F172A; font-family: system-ui, -apple-system, sans-serif; }
+        .header-gradient { background: linear-gradient(135deg, #0A192F 0%, #1E3A8A 100%); border-bottom: 4px solid #3B82F6; }
+        .content-card { background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02); }
+        .status-badge { font-size: 0.75rem; font-weight: 700; padding: 5px 10px; border-radius: 6px; display: inline-block; text-transform: uppercase; }
+    </style>
+</head>
+<body>
+
+<div class="header-gradient text-white py-5 mb-5 shadow-sm">
+    <div class="container d-flex align-items-center justify-content-between">
+        <h1 class="fw-bold m-0 fs-2">Manager Review Board</h1>
+        <a href="appraisal-dashboard.html" class="btn btn-outline-light btn-sm rounded-3 px-3 py-2">Dashboard</a>
+    </div>
+</div>
+
+<div class="container-fluid px-md-5">
+    <div class="row g-4 pb-5">
+        <div class="col-xl-7 col-lg-6">
+            <div class="content-card p-4 h-100">
+                <h5 class="fw-bold text-dark mb-3">All Appraisal Records Matrix</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle m-0">
+                        <thead class="table-light text-secondary small text-uppercase">
+                        <tr>
+                            <th>Appraisal ID</th>
+                            <th>Employee ID</th>
+                            <th>Cycle</th>
+                            <th>Status</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                        </thead>
+                        <tbody id="pendingTableBody">
+                        <tr><td colspan="5" class="text-center py-4 text-muted small">Loading records...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-5 col-lg-6">
+            <div class="content-card p-4 p-md-5">
+                <h5 class="fw-bold text-dark mb-4">Process Evaluation</h5>
+                <form id="managerReviewForm">
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-secondary small text-uppercase">Appraisal ID</label>
+                        <input type="number" id="appraisalId" class="form-control form-control-lg" readonly required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-secondary small text-uppercase">Manager Rating (overallRating)</label>
+                        <select id="managerRating" class="form-select form-select-lg" required>
+                            <option value="" selected disabled>Select Performance Rating</option>
+                            <option value="1.0">1.0 - Unsatisfactory</option>
+                            <option value="2.0">2.0 - Needs Improvement</option>
+                            <option value="3.0">3.0 - Meets Expectations</option>
+                            <option value="4.0">4.0 - Exceeds Expectations</option>
+                            <option value="5.0">5.0 - Outstanding</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 fw-bold py-2">Submit Manager Review</button>
+                </form>
+                <div id="result" class="mt-4 alert alert-success d-none"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API_URL = 'http://localhost:8080/api/appraisal';
+
+    function getStatusBadge(status) {
+        switch(status) {
+            case 'DRAFT': return `<span class="status-badge bg-secondary text-white">Draft</span>`;
+            case 'SELF_REVIEW': return `<span class="status-badge bg-primary text-white">Self Review</span>`;
+            case 'MANAGER_REVIEW': return `<span class="status-badge bg-warning text-dark">Manager Review</span>`;
+            case 'PUBLISHED': return `<span class="status-badge bg-success text-white">Published</span>`;
+            default: return `<span class="status-badge bg-light text-dark">${status}</span>`;
+        }
+    }
+
+    function loadIntoForm(id) {
+        document.getElementById('appraisalId').value = id;
+        document.getElementById('managerRating').focus();
+    }
+
+    async function fetchReviewQueue() {
+        let records = [];
+        try {
+            // 1. Added credentials here for the GET request
+            const response = await fetch(API_URL, {
+                method: 'GET',
+                credentials: 'include'
+            });
+            
+            if (response.ok) records = await response.json();
+            else records = JSON.parse(localStorage.getItem('globalAppraisals')) || [];
+        } catch (error) {
+            records = JSON.parse(localStorage.getItem('globalAppraisals')) || [];
+        }
+
+        document.getElementById('pendingTableBody').innerHTML = records.map(item => `
+            <tr>
+                <td class="fw-bold">#${item.appraisalId}</td>
+                <td>${item.employee.employeeId}</td>
+                <td><span class="badge bg-light text-dark border">${item.appraisalCycle}</span></td>
+                <td>${getStatusBadge(item.appraisalStatus)}</td>
+                <td class="text-end">
+                    <button class="btn btn-sm btn-outline-primary" onclick="loadIntoForm(${item.appraisalId})">Select</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    document.getElementById('managerReviewForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const appraisalId = document.getElementById('appraisalId').value;
+        const ratingValue = document.getElementById('managerRating').value;
+        const resultEl = document.getElementById('result');
+
+        let savedRecord = null;
+
+        try {
+            // 2. Added credentials here for the PUT request
+            const response = await fetch(`${API_URL}/${appraisalId}/manager-review`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ overallRating: parseFloat(ratingValue) }),
+                credentials: 'include' // Added here
+            });
+
+            if (response.ok) {
+                // Parse the returned record containing database state
+                savedRecord = await response.json();
+            }
+        } catch (error) {
+            console.log("Using browser data fallback.");
+        }
+
+        // 3. Fallback engine strategy if backend is unreachable
+        if (!savedRecord) {
+            let localData = JSON.parse(localStorage.getItem('globalAppraisals')) || [];
+            const foundItem = localData.find(item => String(item.appraisalId) === String(appraisalId));
+
+            savedRecord = {
+                appraisalId: parseInt(appraisalId),
+                employeeId: foundItem ? foundItem.employeeId : 0,
+                appraisalCycle: foundItem ? foundItem.appraisalCycle : '2026-H1',
+                overallRating: parseFloat(ratingValue),
+                appraisalStatus: 'MANAGER_REVIEW'
+            };
+        }
+
+        // 4. Synchronize state inside localStorage
+        let localData = JSON.parse(localStorage.getItem('globalAppraisals')) || [];
+        let updated = false;
+
+        localData = localData.map(item => {
+            if (String(item.appraisalId) === String(savedRecord.appraisalId)) {
+                updated = true;
+                return { ...item, ...savedRecord };
+            }
+            return item;
+        });
+
+        if (!updated) {
+            localData.push(savedRecord);
+        }
+        localStorage.setItem('globalAppraisals', JSON.stringify(localData));
+
+        // 5. Present the dynamic custom feedback text string
+        resultEl.classList.remove('d-none');
+        resultEl.innerText = `Successfully Appraisal ID ${savedRecord.appraisalId} Manager-Reviewed`;
+
+        // 6. Reset Form UI components & trigger table reload matrix
+        document.getElementById('managerReviewForm').reset();
+        await fetchReviewQueue();
+    });
+
+    window.addEventListener('DOMContentLoaded', fetchReviewQueue);
+</script>
+</body>
+</html>

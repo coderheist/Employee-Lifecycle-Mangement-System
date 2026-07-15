@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HRMS - Offer Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/recruiter.css">
+</head>
+<body>
+    <!-- Top Navigation -->
+    <div class="topnav">
+        <div class="topnav-inner">
+            <div class="brand">
+                <div class="brand-icon"><i class="fas fa-users"></i></div>
+                <div>
+                    <div class="brand-text">HRMS System</div>
+                    <div class="brand-sub">Recruitment Module</div>
+                </div>
+            </div>
+            <div class="nav-tabs-hrms">
+                <a class="nav-item" href="dashboard-recruiter.html">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+                <a class="nav-item" href="candidates-recruiter.html">
+                    <i class="fas fa-user-tie"></i> Candidates
+                </a>
+                <a class="nav-item" href="requisitions-recruiter.html">
+                    <i class="fas fa-briefcase"></i> Requisitions
+                </a>
+                <a class="nav-item" href="interviews-recruiter.html">
+                    <i class="fas fa-calendar-alt"></i> Interviews
+                </a>
+                <a class="nav-item active" href="offers-recruiter.html">
+                    <i class="fas fa-file-contract"></i> Offers
+                </a>
+            </div>
+            <div class="user-chip">
+                <div class="user-avatar" id="userAvatar">HR</div>
+                <div>
+                    <div class="user-name" id="userName">HR Manager</div>
+                    <div class="user-role" id="userRole">Recruiter</div>
+                </div>
+            </div>
+            <div class="auth-buttons">
+                <button class="btn-logout" onclick="handleLogout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main">
+        <div class="topbar">
+            <div>
+                <h1 class="page-title">Offer Management</h1>
+                <p class="page-subtitle">Rollout and manage offers</p>
+            </div>
+            <button class="btn-primary-hrms" onclick="showRolloutOfferForm()">
+                <i class="fas fa-file-contract"></i> Rollout Offer
+            </button>
+        </div>
+
+        <!-- Offer Form -->
+        <div class="card" id="offerFormCard" style="display:none;">
+            <div class="card-head">
+                <i class="fas fa-file-contract"></i>
+                <h6 id="offerFormTitle">Rollout Offer Letter</h6>
+            </div>
+            <div class="card-body-inner">
+                <form id="offerForm">
+                    <input type="hidden" id="offerId">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Candidate *</label>
+                            <select class="form-select" id="offerCandidateId" required>
+                                <option value="">Select Candidate</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Position Offered *</label>
+                            <input type="text" class="form-control" id="positionOffered" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Department *</label>
+                            <input type="text" class="form-control" id="offerDepartment" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Salary Offered *</label>
+                            <input type="number" class="form-control" id="salaryOffered" step="0.01" min="0" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Offer Status *</label>
+                            <select class="form-select" id="offerStatus" required>
+                                <option value="DRAFTED">Drafted</option>
+                                <option value="SENT">Sent</option>
+                                <option value="ACCEPTED">Accepted</option>
+                                <option value="REJECTED">Rejected</option>
+                                <option value="WITHDRAWN">Withdrawn</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Offer Date *</label>
+                            <input type="date" class="form-control" id="offerDate" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Joining Date *</label>
+                            <input type="date" class="form-control" id="joiningDate" required>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">Additional Benefits</label>
+                            <textarea class="form-control" id="additionalBenefits" rows="2" placeholder="e.g., Health Insurance, Stock Options, etc."></textarea>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">Remarks</label>
+                            <textarea class="form-control" id="offerRemarks" rows="2"></textarea>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn-primary-hrms"><i class="fas fa-save"></i> Rollout Offer</button>
+                        <button type="button" class="btn-sm-outline" onclick="cancelOfferForm()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+
+        <!-- Offer Table -->
+        <div class="card">
+            <div class="card-head">
+                <i class="fas fa-list"></i>
+                <h6>Offer List</h6>
+            </div>
+            <div class="card-body-inner">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr><th>ID</th><th>Candidate</th><th>Position</th><th>Department</th><th>Salary</th><th>Offer Date</th><th>Joining Date</th><th>Status</th><th>Actions</th></tr>
+                        </thead>
+                        <tbody id="offerTableBody">
+                            <tr><td colspan="9" class="text-center">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Toast -->
+    <div class="toast-box" id="toastBox"></div>
+
+    <script src="../js/recruiter.js"></script>
+</body>
+</html>  

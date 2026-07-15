@@ -1,0 +1,369 @@
+/* ===========================================================
+   HRMS Recruitment Module — recruiter.css
+   Bootstrap handles layout/spacing; this file only covers
+   the things Bootstrap doesn't: brand colors, nav, pills, toast.
+   =========================================================== */
+
+:root {
+    --brand: #1a237e;
+    --brand-light: #3949ab;
+    --bg: #f4f6fb;
+    --border: #e5e7eb;
+    --text-muted: #6b7280;
+}
+
+body {
+    background: var(--bg);
+    font-family: 'Inter', sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* ---------- Top Navigation ---------- */
+
+.topnav {
+    background: var(--brand);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.topnav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 24px;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #fff;
+}
+
+.brand-icon {
+    width: 34px;
+    height: 34px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.brand-text {
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.brand-sub {
+    font-size: 0.68rem;
+    opacity: 0.6;
+}
+
+.nav-tabs-hrms {
+    display: flex;
+    gap: 4px;
+}
+
+.nav-item {
+    padding: 8px 14px;
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.nav-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.nav-item.active {
+    background: rgba(255, 255, 255, 0.18);
+    color: #fff;
+}
+
+.user-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #fff;
+}
+
+.user-avatar {
+    width: 30px;
+    height: 30px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.user-name {
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.user-role {
+    font-size: 0.68rem;
+    opacity: 0.6;
+}
+
+.btn-logout {
+    background: #dc3545;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 7px 16px;
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+.btn-logout:hover {
+    background: #b02a37;
+}
+
+/* ---------- Page Layout ---------- */
+
+.main {
+    padding: 24px;
+}
+
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.page-title {
+    color: var(--brand);
+    margin: 0;
+}
+
+.page-subtitle {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin: 2px 0 0;
+}
+
+/* ---------- Cards ---------- */
+
+.card {
+    border-radius: 12px;
+    border-color: var(--border);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.card-head {
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.card-head i {
+    color: var(--brand-light);
+}
+
+.card-head h6 {
+    margin: 0;
+    color: var(--brand);
+}
+
+.card-body-inner {
+    padding: 18px;
+}
+
+/* ---------- Dashboard Cards ---------- */
+
+.leave-chip {
+    background: #eef1fd;
+    border: 1px solid #c7d2fe;
+    border-radius: 10px;
+    padding: 14px;
+    text-align: center;
+}
+
+.lc-count {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--brand);
+}
+
+.lc-label {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+}
+
+/* ---------- Buttons ---------- */
+
+.btn-primary-hrms {
+    background: var(--brand);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.btn-primary-hrms:hover {
+    background: var(--brand-light);
+    color: #fff;
+}
+
+.btn-sm-outline {
+    border: 1px solid var(--brand-light);
+    color: var(--brand-light);
+    background: none;
+    border-radius: 6px;
+    padding: 4px 12px;
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
+.btn-sm-outline:hover {
+    background: #eef1fd;
+}
+
+.btn-action {
+    border: none;
+    background: none;
+    color: var(--brand-light);
+    padding: 4px 8px;
+}
+
+.btn-action.delete {
+    color: #dc3545;
+}
+
+/* ---------- Tables ---------- */
+
+.table thead th {
+    background: #f8f9ff;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #374151;
+}
+
+.table tbody tr:hover {
+    background: #fafbff;
+}
+
+/* ---------- Status Pills ---------- */
+
+.pill {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.73rem;
+    font-weight: 600;
+}
+
+.pill-accepted,
+.pill-hired,
+.pill-completed,
+.pill-filled {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.pill-offered,
+.pill-scheduled,
+.pill-sent,
+.pill-open,
+.pill-in_progress {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.pill-applied,
+.pill-in_interview,
+.pill-rescheduled,
+.pill-medium {
+    background: #fef9c3;
+    color: #92400e;
+}
+
+.pill-high {
+    background: #fed7aa;
+    color: #c2410c;
+}
+
+.pill-rejected,
+.pill-cancelled,
+.pill-no_show,
+.pill-urgent {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.pill-drafted,
+.pill-withdrawn,
+.pill-closed,
+.pill-low {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+/* ---------- Offer Detail View ---------- */
+
+.section-title {
+    color: var(--brand-light);
+    font-size: 1rem;
+    font-weight: 600;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--border);
+    margin-bottom: 14px;
+}
+
+.detail-item {
+    margin-bottom: 14px;
+}
+
+.detail-item label {
+    display: block;
+    font-weight: 600;
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+}
+
+.detail-item span,
+.detail-item p {
+    color: #111827;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* ---------- Toast ---------- */
+
+.toast-box {
+    display: none;
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--brand);
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    z-index: 999;
+}

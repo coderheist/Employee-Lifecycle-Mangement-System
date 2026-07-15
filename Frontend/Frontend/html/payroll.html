@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payroll Officer Dashboard</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --bg: #f4f7f6;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 0;
+            padding-bottom: 20px;
+        }
+
+        /* Navbar Styles */
+        .topnav {
+            background-color: var(--primary);
+            color: white;
+            padding: 10px 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .topnav-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .brand-text {
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .brand-sub {
+            font-size: 12px;
+            color: #bdc3c7;
+        }
+        .user-chip {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .user-avatar {
+            background-color: var(--secondary);
+            color: white;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: bold;
+        }
+        .user-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .user-role {
+            font-size: 12px;
+            color: #bdc3c7;
+            text-align: right;
+        }
+        .auth-top-right-container {
+        position: absolute;
+        top: 15px;
+        right: 30px;
+        z-index: 1050; /* Ensures it stays above tables and cards */
+    }
+
+    /* Clean, modern logout button styling */
+    .btn-logout {
+        background-color: #dc3545; /* Clean professional red */
+        color: #ffffff;
+        border: 1px solid transparent;
+        padding: 8px 16px;
+        font-size: 14px;
+        font-weight: 500;
+        border-radius: 6px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px; /* Clean spacing between FontAwesome icon and text */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: background-color 0.15s ease, transform 0.1s ease;
+    }
+
+    /* Hover and interaction transitions */
+    .btn-logout:hover {
+        background-color: #bd2130; /* Slightly darker red on hover */
+    }
+
+    .btn-logout:active {
+        transform: scale(0.97); /* Micro-interaction click effect */
+    }
+        
+
+        /* Dashboard Styles */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        h2 { color: var(--primary); margin-bottom: 0; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 25px; }
+
+        /* Flex headers for right-side filters */
+        .card-header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid #ecf0f1; padding-bottom: 15px; }
+
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .summary-box { border-left: 4px solid var(--secondary); background: #fff; padding: 15px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .summary-box.green { border-left-color: var(--success); }
+        .summary-box h4 { margin: 0 0 10px 0; font-size: 12px; color: #7f8c8d; text-transform: uppercase; }
+        .summary-box .value { font-size: 24px; font-weight: bold; color: var(--primary); }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 15px; align-items: end; }
+        .form-group { display: flex; flex-direction: column; position: relative; }
+        label { font-weight: 600; font-size: 13px; margin-bottom: 5px; color: var(--primary); }
+        input, select { padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+        input[readonly] { background-color: #eef2f5; color: #7f8c8d; }
+        .autocomplete-results { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ccc; border-top: none; z-index: 1000; max-height: 150px; overflow-y: auto; display: none; }
+        .autocomplete-results div { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; }
+        .autocomplete-results div:hover { background-color: #f1f2f6; }
+
+        /* Buttons */
+        .btn { padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; color: white; transition: 0.2s; }
+        .btn-primary { background-color: var(--secondary); }
+        .btn-primary:hover { background-color: #2980b9; }
+        .btn-success { background-color: var(--success); }
+        .btn-outline { background-color: transparent; border: 1px solid var(--secondary); color: var(--secondary); }
+        .btn-outline:hover { background-color: var(--secondary); color: white; }
+
+        /* Table */
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th, td { border-bottom: 1px solid #eee; padding: 12px; text-align: left; }
+        th { background-color: #f8f9fa; color: var(--primary); font-weight: 600; text-transform: uppercase; font-size: 12px; }
+        .status { font-weight: bold; }
+        .status-PAID { color: var(--success); }
+        .status-PENDING, .status-DRAFT { color: var(--danger); }
+    </style>
+</head>
+<body>
+
+<nav class="topnav">
+    <div class="topnav-inner">
+        <div class="brand">
+            <div class="brand-icon">🏢</div>
+            <div>
+                <div class="brand-text">Cognizant HRMS</div>
+                <div class="brand-sub">Payroll Portal</div>
+            </div>
+        </div>
+        <!-- <div class="user-chip">
+            <div class="user-avatar">JD</div>
+            <div>
+                <div class="user-name">John Doe</div>
+                <div class="user-role">Payroll Officer</div>
+            </div>
+        </div> -->
+        <div class="auth-top-right-container">
+                <button class="btn-logout" onclick="handleLogout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+    </div>
+</nav>
+
+<div class="container">
+
+    <div class="card">
+        <div class="card-header-flex">
+            <h2>Compliance & Analytics Report</h2>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <label style="margin: 0; font-weight: bold; color: var(--primary);">Filter by Period:</label>
+                <input type="month" id="reportPeriod" style="padding: 8px;" onchange="loadSummaryData()"/>
+                <button class="btn btn-outline" onclick="document.getElementById('reportPeriod').value=''; loadSummaryData();" style="padding: 8px 12px;">Clear</button>
+            </div>
+        </div>
+
+        <div class="summary-grid">
+            <div class="summary-box">
+                <h4>Total Gross Processed</h4>
+                <div class="value" id="sumGross">₹0.00</div>
+            </div>
+            <div class="summary-box green">
+                <h4>Total Net Payout</h4>
+                <div class="value" id="sumNet">₹0.00</div>
+            </div>
+            <div class="summary-box">
+                <h4>Total Paid Records</h4>
+                <div class="value" id="countPaid">0</div>
+            </div>
+            <div class="summary-box">
+                <h4>Total Pending Records</h4>
+                <div class="value" id="countPending">0</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2 style="border-bottom: 2px solid #ecf0f1; padding-bottom: 15px; margin-bottom: 15px;">Run New Payroll</h2>
+        <form id="payrollForm" onsubmit="submitPayroll(event)">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Employee ID Search</label>
+                    <input type="number" id="empIdSearch" placeholder="Type ID..." autocomplete="off" required>
+                    <div id="searchResults" class="autocomplete-results"></div>
+                </div>
+                <div class="form-group">
+                    <label>Base Gross Salary</label>
+                    <input type="number" id="grossSalary" placeholder="Auto-filled" readonly required>
+                </div>
+                <div class="form-group">
+                    <label>Pay Period</label>
+                    <input type="month" id="payPeriod" required>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="payrollStatus" required>
+                        <option value="">Select Status...</option>
+                        <option value="DRAFT">DRAFT</option>
+                        <option value="PROCESSED">PROCESSED</option>
+                        <option value="ON_HOLD">ON_HOLD</option>
+                        <option value="PAID">PAID</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary" style="margin-bottom: 2px;">Submit</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="card">
+        <div class="card-header-flex">
+            <h2>Payroll View (Pending & Completed)</h2>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <label style="margin: 0; font-weight: bold; color: var(--primary);">Filter by Period:</label>
+                <input type="month" id="tableFilterPeriod" style="padding: 8px;" onchange="loadTableData()"/>
+                <button class="btn btn-outline" onclick="document.getElementById('tableFilterPeriod').value=''; loadTableData();" style="padding: 8px 12px;">Clear</button>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+            <tr>
+                <th>Payroll ID</th>
+                <th>Employee ID</th>
+                <th>Pay Period</th>
+                <th>Gross Salary</th>
+                <th>Deductions</th>
+                <th>Net Salary</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody id="payrollTableBody">
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+    const API_BASE_URL = 'http://localhost:8080/api/payroll';
+    let globalEmployeeData = [];
+
+    // --- 1. Load Initial Data when page opens ---
+    window.onload = async () => {
+        await fetchEmployeeData();
+
+        // This will trigger the 0s initially because the inputs are empty on load
+        await loadSummaryData();
+        await loadTableData();
+    };
+
+    // --- 2. Fetch Employee list for Autocomplete ---
+    async function fetchEmployeeData() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/form-data`, {
+                method: 'GET',
+                credentials: 'include' // Added credentials
+            });
+            const data = await response.json();
+            globalEmployeeData = data.employees || [];
+        } catch (error) {
+            console.error("Error fetching employees:", error);
+        }
+    }
+
+    // --- 3. Autocomplete Logic ---
+    const searchInput = document.getElementById('empIdSearch');
+    const resultsContainer = document.getElementById('searchResults');
+    const salaryInput = document.getElementById('grossSalary');
+
+    searchInput.addEventListener('input', function() {
+        const query = this.value;
+        resultsContainer.innerHTML = '';
+        salaryInput.value = '';
+
+        if (!query || globalEmployeeData.length === 0) {
+            resultsContainer.style.display = 'none';
+            return;
+        }
+
+        const filtered = globalEmployeeData.filter(emp => emp.employeeId.toString().includes(query));
+
+        if (filtered.length > 0) {
+            resultsContainer.style.display = 'block';
+            filtered.forEach(emp => {
+                const div = document.createElement('div');
+                div.textContent = `Employee ID: ${emp.employeeId} - ${emp.name}`;
+
+                div.onclick = () => {
+                    searchInput.value = emp.employeeId;
+                    salaryInput.value = emp.salary;
+                    resultsContainer.style.display = 'none';
+                };
+                resultsContainer.appendChild(div);
+            });
+        } else {
+            resultsContainer.style.display = 'none';
+        }
+    });
+
+    document.addEventListener('click', (e) => {
+        if (e.target !== searchInput) resultsContainer.style.display = 'none';
+    });
+
+    // --- 4. Submit New Payroll ---
+    async function submitPayroll(event) {
+        event.preventDefault();
+
+        const payload = {
+            payPeriod: document.getElementById('payPeriod').value,
+            payrollStatus: document.getElementById('payrollStatus').value,
+            employee: {
+                employeeId: parseInt(document.getElementById('empIdSearch').value,10)
+            }
+        };
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/run`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+                credentials: 'include' // Already correctly present
+            });
+
+            if (response.ok) {
+                alert("Payroll executed successfully!");
+                document.getElementById('payrollForm').reset();
+                salaryInput.value = '';
+
+                // Refresh both sections independently after new entry
+                loadSummaryData();
+                loadTableData();
+            } else {
+                const errorData = await response.json();
+                if (errorData.error) {
+                    alert(errorData.error); 
+                } else {
+                    alert("Failed to submit payroll. Please check your inputs.");
+                }
+            }
+        } catch (error) {
+            console.error("Error running payroll:", error);
+            alert("Could not connect to backend to save payroll.");
+        }
+    }
+
+    // --- 5A. Load Summary Data (Compliance & Analytics Section) ---
+    async function loadSummaryData() {
+        const monthInput = document.getElementById('reportPeriod').value;
+
+        if (!monthInput) {
+            document.getElementById('sumGross').innerText = '₹0.00';
+            document.getElementById('sumNet').innerText = '₹0.00';
+            document.getElementById('countPaid').innerText = '0';
+            document.getElementById('countPending').innerText = '0';
+            return;
+        }
+
+        const url = `${API_BASE_URL}/dashboard?month=${monthInput}`;
+
+        try {
+            const response = await fetch(url, {
+                method: 'GET',
+                credentials: 'include' // Added credentials
+            });
+            const data = await response.json();
+
+            // Update Summary Boxes with fetched data
+            document.getElementById('sumGross').innerText = '₹' + (data.totalGross || 0).toFixed(2);
+            document.getElementById('sumNet').innerText = '₹' + (data.totalNetPay || 0).toFixed(2);
+            document.getElementById('countPaid').innerText = data.paidCount || 0;
+            document.getElementById('countPending').innerText = data.pendingCount || 0;
+        } catch (error) {
+            console.error("Error loading summary data:", error);
+        }
+    }
+
+    // --- 5B. Load Table Data (Payroll View Section) ---
+    async function loadTableData() {
+        const monthInput = document.getElementById('tableFilterPeriod').value;
+        const tbody = document.getElementById('payrollTableBody');
+
+        if (!monthInput) {
+            tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 20px; color: #7f8c8d;">Please select a Pay Period to view records.</td></tr>`;
+            return;
+        }
+
+        const url = `${API_BASE_URL}/dashboard?month=${monthInput}`;
+
+        try {
+            const response = await fetch(url, {
+                method: 'GET',
+                credentials: 'include' // Added credentials
+            });
+            const data = await response.json();
+
+            tbody.innerHTML = '';
+
+            if (!data.payrolls || data.payrolls.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 20px; color: #7f8c8d;">No payroll records found for this period.</td></tr>`;
+                return;
+            }
+
+            data.payrolls.forEach(p => {
+                const isPaid = p.payrollStatus === 'PAID';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${p.payrollId || 'N/A'}</td>
+                    <td>Emp ID: ${p.employee ? p.employee.employeeId : 'N/A'}</td>
+                    <td>${p.payPeriod}</td>
+                    <td>₹${(p.grossSalary || 0).toFixed(2)}</td>
+                    <td>₹${(p.totalDeductions || 0).toFixed(2)}</td>
+                    <td>₹${(p.netSalary || 0).toFixed(2)}</td>
+                    <td class="status status-${p.payrollStatus}">${p.payrollStatus}</td>
+                    <td>
+                        ${!isPaid ? `<button class="btn btn-outline" style="padding: 5px 10px; font-size: 12px;" onclick="markAsPaid(${p.payrollId})">Mark as Paid</button>` : '-'}                    
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        } catch (error) {
+            console.error("Error loading table data:", error);
+        }
+    }
+
+    // --- 6. Mark Payroll as Paid ---
+    async function markAsPaid(payrollId) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/markAsPaid/${payrollId}`, {
+                method: 'PUT',
+                credentials: 'include' // Already correctly present
+            });
+
+            if (response.ok) {
+                alert("Marked as PAID successfully!");
+                // Keep UI in sync with DB
+                loadSummaryData();
+                loadTableData();
+            } else {
+                alert("Failed to update status.");
+            }
+        } catch (error) {
+            console.error("Error updating status:", error);
+        }
+    }
+    async function handleLogout() {
+    try {
+        const response = await fetch('http://localhost:8080/api/auth/logout', {
+            method: 'POST', // Spring Security prefers POST requests for mutations like logout
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include' // CRITICAL: Sends the JSESSIONID cookie so the server knows which session to kill
+        });
+ 
+        if (response.ok) {
+            // 1. Clear any frontend cached variables
+            localStorage.removeItem("user_roles");
+ 
+            // 2. Redirect back to the login page
+            window.location.href = "../html/login.html";
+        } else {
+            console.error("Backend failed to clear session context.");
+            // Fallback safety redirect
+            window.location.href = "../html/login.html";
+        }
+    } catch (error) {
+        console.error("Network error during logout operation:", error);
+        // Force redirect to login even if the network fails
+        window.location.href = "../html/login.html";
+    }
+}
+</script>
+
+</body>
+</html>

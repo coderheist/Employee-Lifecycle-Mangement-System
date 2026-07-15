@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance Appraisal & Goal Tracking System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #F8FAFC;
+            color: #0F172A;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+        .header-gradient {
+            background: linear-gradient(135deg, #0A192F 0%, #1E3A8A 100%);
+            border-bottom: 4px solid #3B82F6;
+        }
+        .metric-card {
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .metric-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(30, 58, 138, 0.05);
+            border-color: #3B82F6;
+        }
+        .flow-card {
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-radius: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        .flow-card:hover {
+            transform: translateY(-5px);
+            border-color: #2563EB;
+            box-shadow: 0 20px 25px -5px rgba(37, 99, 235, 0.08);
+        }
+        .flow-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background-color: #2563EB;
+            transform: scaleY(0);
+            transition: transform 0.2s ease;
+        }
+        .flow-card:hover::before {
+            transform: scaleY(1);
+        }
+        .icon-shape {
+            background-color: #EFF6FF;
+            color: #1E40AF;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            transition: all 0.3s ease;
+        }
+        .flow-card:hover .icon-shape {
+            background-color: #1E40AF;
+            color: #FFFFFF;
+        }
+        .step-tag {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 700;
+            color: #2563EB;
+            background-color: #EFF6FF;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+        .auth-top-right-container {
+        position: absolute;
+        top: 50px;
+        right: 30px;
+        z-index: 1050; /* Ensures it stays above tables and cards */
+    }
+
+    /* Clean, modern logout button styling */
+    .btn-logout {
+        background-color: #dc3545; /* Clean professional red */
+        color: #ffffff;
+        border: 1px solid transparent;
+        padding: 8px 16px;
+        font-size: 14px;
+        font-weight: 500;
+        border-radius: 6px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px; /* Clean spacing between FontAwesome icon and text */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: background-color 0.15s ease, transform 0.1s ease;
+    }
+
+    /* Hover and interaction transitions */
+    .btn-logout:hover {
+        background-color: #bd2130; /* Slightly darker red on hover */
+    }
+
+    .btn-logout:active {
+        transform: scale(0.97); /* Micro-interaction click effect */
+    }
+    </style>
+</head>
+<body>
+
+<div class="header-gradient text-white py-5 mb-5 shadow-sm">
+    <div class="container">
+        <h1 class="fw-extrabold m-0 tracking-tight fs-2">Performance Appraisal & Goal Tracking</h1>
+    </div>
+    <div class="auth-top-right-container">
+                <button class="btn-logout" onclick="handleLogout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+</div>
+
+<div class="container">
+    <div class="mb-4">
+        <h5 class="fw-bold text-secondary text-uppercase tracking-wider m-0 small d-flex align-items-center gap-2">
+            <i class="bi bi-bar-chart-line text-primary"></i> Live System Metrics
+        </h5>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-6 col-md-3">
+            <div class="metric-card p-4">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <span class="text-muted small fw-medium text-wrap">Goals Initialized</span>
+                    <div class="text-primary"><i class="bi bi-file-earmark-plus fs-5"></i></div>
+                </div>
+                <div class="display-5 fw-bold text-dark" id="countDraft">0</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="metric-card p-4">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <span class="text-muted small fw-medium text-wrap">Employee Self-Reviewed</span>
+                    <div class="text-primary"><i class="bi bi-person-workspace fs-5"></i></div>
+                </div>
+                <div class="display-5 fw-bold text-dark" id="countSelf">0</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="metric-card p-4">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <span class="text-muted small fw-medium text-wrap">Manager Reviewed</span>
+                    <div class="text-primary"><i class="bi bi-clipboard-check fs-5"></i></div>
+                </div>
+                <div class="display-5 fw-bold text-dark" id="countManager">0</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="metric-card p-4">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <span class="text-muted small fw-medium text-wrap">Published</span>
+                    <div class="text-primary"><i class="bi bi-send-check fs-5"></i></div>
+                </div>
+                <div class="display-5 fw-bold text-dark" id="countPublished">0</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-4">
+        <h5 class="fw-bold text-secondary text-uppercase tracking-wider m-0 small d-flex align-items-center gap-2">
+            <i class="bi bi-arrow-right-circle text-primary"></i> Appraisal Performance Measure Flow
+        </h5>
+    </div>
+
+    <div class="row g-4 pb-5">
+        <div class="col-md-6">
+            <a href="initialize.html" class="flow-card p-4">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div class="icon-shape"><i class="bi bi-bullseye"></i></div>
+                    <span class="step-tag">Phase 01</span>
+                </div>
+                <h4 class="fw-bold text-dark fs-5 m-0">Set Employee Goals</h4>
+            </a>
+        </div>
+
+        <div class="col-md-6">
+            <a href="self-review.html" class="flow-card p-4">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div class="icon-shape"><i class="bi bi-pencil-square"></i></div>
+                    <span class="step-tag">Phase 02</span>
+                </div>
+                <h4 class="fw-bold text-dark fs-5 m-0">Employee Self-Review</h4>
+            </a>
+        </div>
+
+        <div class="col-md-6">
+            <a href="manager-review.html" class="flow-card p-4">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div class="icon-shape"><i class="bi bi-eye"></i></div>
+                    <span class="step-tag">Phase 03</span>
+                </div>
+                <h4 class="fw-bold text-dark fs-5 m-0">Manager Evaluation</h4>
+            </a>
+        </div>
+
+        <div class="col-md-6">
+            <a href="publish.html" class="flow-card p-4">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div class="icon-shape"><i class="bi bi-cloud-arrow-up"></i></div>
+                    <span class="step-tag">Phase 04</span>
+                </div>
+                <h4 class="fw-bold text-dark fs-5 m-0">Final Approval & Publish</h4>
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API_URL = 'http://localhost:8080/api/appraisal';
+
+    // Seed data baseline structure if local environment tracker is fresh
+    if (!localStorage.getItem('globalAppraisals')) {
+        localStorage.setItem('globalAppraisals', JSON.stringify([
+            { appraisalId: 50113, employeeId: 10394, appraisalCycle: '2026-H1', appraisalStatus: 'DRAFT' },
+            { appraisalId: 50114, employeeId: 10442, appraisalCycle: '2026-H1', appraisalStatus: 'SELF_REVIEW' }
+        ]));
+    }
+
+    async function runSystemMetricsScanner() {
+        let records = [];
+        try {
+            // Added credentials here for the metrics GET request
+            const response = await fetch(API_URL, {
+                method: 'GET',
+                credentials: 'include'
+            });
+            
+            if (response.ok) {
+                records = await response.json();
+            } else {
+                records = JSON.parse(localStorage.getItem('globalAppraisals')) || [];
+            }
+        } catch (error) {
+            records = JSON.parse(localStorage.getItem('globalAppraisals')) || [];
+        }
+
+        // Map perfectly to your original HTML IDs based on status transitions
+        document.getElementById('countDraft').innerText = records.filter(r => r.appraisalStatus === 'DRAFT').length;
+        document.getElementById('countSelf').innerText = records.filter(r => r.appraisalStatus === 'SELF_REVIEW').length;
+        document.getElementById('countManager').innerText = records.filter(r => r.appraisalStatus === 'MANAGER_REVIEW').length;
+        document.getElementById('countPublished').innerText = records.filter(r => r.appraisalStatus === 'PUBLISHED').length;
+    }
+    async function handleLogout() {
+    try {
+        const response = await fetch('http://localhost:8080/api/auth/logout', {
+            method: 'POST', // Spring Security prefers POST requests for mutations like logout
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include' // CRITICAL: Sends the JSESSIONID cookie so the server knows which session to kill
+        });
+ 
+        if (response.ok) {
+            // 1. Clear any frontend cached variables
+            localStorage.removeItem("user_roles");
+ 
+            // 2. Redirect back to the login page
+            window.location.href = "../html/login.html";
+        } else {
+            console.error("Backend failed to clear session context.");
+            // Fallback safety redirect
+            window.location.href = "../html/login.html";
+        }
+    } catch (error) {
+        console.error("Network error during logout operation:", error);
+        // Force redirect to login even if the network fails
+        window.location.href = "../html/login.html";
+    }
+}
+
+    window.addEventListener('DOMContentLoaded', runSystemMetricsScanner);
+</script>
+</body>
+</html>
